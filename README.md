@@ -1,99 +1,118 @@
-<!--
-title: 'AWS Simple HTTP Endpoint example in Python'
-description: 'This template demonstrates how to make a simple HTTP API with Python running on AWS Lambda and API Gateway using the Serverless Framework.'
-layout: Doc
-framework: v4
-platform: AWS
-language: python
-authorLink: 'https://github.com/serverless'
-authorName: 'Serverless, Inc.'
-authorAvatar: 'https://avatars1.githubusercontent.com/u/13742415?s=200&v=4'
--->
+# Phrase Classification API on AWS
 
-# Serverless Framework Python HTTP API on AWS
+This project provides a Python API built using the Serverless framework to classify customer phrases based on intent categories provided in a CSV file. The API uses embeddings to find the most relevant intents based on the input phrase.
 
-This template demonstrates how to make a simple HTTP API with Python running on AWS Lambda and API Gateway using the Serverless Framework.
+## Overview
+The API:
 
-This template does not include any kind of persistence (database). For more advanced examples, check out the [serverless/examples repository](https://github.com/serverless/examples/) which includes DynamoDB, Mongo, Fauna and other examples.
+    Accepts a customer phrase and an intent database (CSV file) with columns Intent and Description.
+    Returns the 0-3 most relevant intent categories based on the input phrase.
+    Is optimized for efficient deployment using AWS Lambda.
+## Features
 
-## Usage
+    Phrase Classification: Matches a phrase with intent descriptions in a CSV to classify the intent.
+    AWS Lambda Compatible: Uses Serverless framework for deployment.
+    Environment Configuration: Loads sensitive data from environment variables or a .env file.
+## Requirements
 
-### Deployment
+    Python 3.8+
+    Node.js (for Serverless framework)
+    Serverless framework (npm install -g serverless)
+    AWS account with appropriate IAM permissions
+    AWS CLI configured locally
+# Setup Instructions
+Clone the Repository:
 
-```
-serverless deploy
-```
+git clone https://github.com/yourusername/phrase-classification-api.git
+cd phrase-classification-api
 
-After deploying, you should see output similar to:
+Configuration Environment Variables
 
-```
-Deploying "aws-python-http-api" to stage "dev" (us-east-1)
+The API configuration uses environment variables. Update in [serverless.yml]
+Variable	Description	Example Value
+    API_URL: "https://api-inference.huggingface.co/models/sentence-transformers/all-MiniLM-L6-v2"
+    AUTH_TOKEN: "Bearer hf_YOUR_TOKEN"
 
-✔ Service deployed to stack aws-python-http-api-dev (85s)
+Install Python Dependencies:
 
-endpoint: GET - https://6ewcye3q4d.execute-api.us-east-1.amazonaws.com/
-functions:
-  hello: aws-python-http-api-dev-hello (2.3 kB)
-```
+pip install -r requirements.txt
 
-_Note_: In current form, after deployment, your API is public and can be invoked by anyone. For production deployments, you might want to configure an authorizer. For details on how to do that, refer to [http event docs](https://www.serverless.com/framework/docs/providers/aws/events/apigateway/).
+Install Serverless (if not already installed):
 
-### Invocation
+npm install -g serverless
 
-After successful deployment, you can call the created application via HTTP:
+Configure AWS CLI (if not configured):
 
-```
-curl https://xxxxxxx.execute-api.us-east-1.amazonaws.com/
-```
+aws configure
 
-Which should result in response similar to the following (removed `input` content for brevity):
 
-```json
-{
-  "message": "Go Serverless v4.0! Your function executed successfully!"
-}
-```
+Running the API Locally
 
-### Local development
+To test the API locally, use the Serverless invoke local command. This simulates Lambda locally with the provided event data.
 
-You can invoke your function locally by using the following command:
+    Start Serverless Offline:
 
-```
-serverless invoke local --function hello
-```
+    serverless offline
 
-Which should result in response similar to the following:
+Invoke Lambda Locally:
 
-```json
-{
-  "statusCode": 200,
-  "body": "{\n  \"message\": \"Go Serverless v4.0! Your function executed successfully!\"}"
-}
-```
+serverless invoke local -f classify -p event.json
 
-Alternatively, it is also possible to emulate API Gateway and Lambda locally by using `serverless-offline` plugin. In order to do that, execute the following command:
+    event.json should contain the test data with the phrase and base64-encoded CSV file:
 
-```
-serverless plugin install -n serverless-offline
-```
+    {
+        "body": {
+            "phrase": "Test phrase",
+            "intents": "<base64 encoded CSV content>"
+        }
+    }
 
-It will add the `serverless-offline` plugin to `devDependencies` in `package.json` file as well as will add it to `plugins` in `serverless.yml`.
 
-After installation, you can start local emulation with:
 
-```
-serverless offline
-```
+Deploying to AWS
 
-To learn more about the capabilities of `serverless-offline`, please refer to its [GitHub repository](https://github.com/dherault/serverless-offline).
+    Deploy: Deploy the API to AWS using Serverless with:
 
-### Bundling dependencies
+    serverless deploy
 
-In case you would like to include 3rd party dependencies, you will need to use a plugin called `serverless-python-requirements`. You can set it up by running the following command:
 
-```
-serverless plugin install -n serverless-python-requirements
-```
+Remove Deployment: When finished, remove the deployment from AWS to avoid charges:
 
-Running the above will automatically add `serverless-python-requirements` to `plugins` section in your `serverless.yml` file and add it as a `devDependency` to `package.json` file. The `package.json` file will be automatically created if it doesn't exist beforehand. Now you will be able to add your dependencies to `requirements.txt` file (`Pipfile` and `pyproject.toml` is also supported but requires additional configuration) and they will be automatically injected to Lambda package during build process. For more details about the plugin's configuration, please refer to [official documentation](https://github.com/UnitedIncome/serverless-python-requirements).
-# classify_intents
+    serverless remove
+
+Testing
+
+
+Run Tests: Run all tests using pytest with:
+
+    pytest tests/
+
+    Environment Variables for Tests:
+        The .env file is automatically loaded by pytest with python-dotenv.
+        If you’re overriding environment variables in tests, use monkeypatch.
+
+
+
+Project Structure
+classify_intents/
+├── handler.py               # Main Lambda handler code
+├── config/
+│   └── settings.py          # Loads environment variables
+├── utils/
+│   ├── classifier.py        # Classification logic and helper functions
+│   ├── csv_parser.py        # Functions to parse CSV content
+├── tests/
+│   ├── test_handler.py      # Test suite for the lambda handler
+│   ├── test_classifier.py   # Test suite for classifier utilities
+├── requirements.txt         # Python dependencies for the project
+├── requirements-test.txt    # Python dependencies for testing
+├── serverless.yml           # Serverless configuration for deployment
+├── .env_example             # Example environment file for setup
+└── README.md                # Project documentation
+
+Additional Notes
+
+    Logging: AWS Lambda logging is set up in handler.py and utils. Logs are output to CloudWatch when deployed.
+    Cost Management: Make sure to remove the deployment from AWS when no longer in use to avoid unexpected charges.
+
+Happy coding!
