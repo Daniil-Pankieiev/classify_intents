@@ -1,0 +1,30 @@
+# "org" ensures this Service is used with the correct Serverless Framework Access Key.
+org: datavise
+# "app" enables Serverless Framework Dashboard features and sharing them with other Services.
+app: classifyintents
+# "service" is the name of this project. This will also be added to your AWS resource names.
+service: classifyintents
+
+provider:
+  name: aws
+  runtime: python3.11
+  environment:
+    API_URL: "https://api-inference.huggingface.co/models/sentence-transformers/all-MiniLM-L6-v2"
+    AUTH_TOKEN: "Bearer YOUR_HUGGING_FACE_TOKEN"
+
+functions:
+  classify:
+    handler: handler.lambda_handler
+    events:
+      - http:
+          path: classify
+          method: post
+          cors: true
+          request:
+            parameters:
+              multipart: true
+
+plugins:
+  - serverless-python-requirements
+  - serverless-offline
+
