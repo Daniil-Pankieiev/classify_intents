@@ -41,8 +41,8 @@ Clone the Repository:
 
 Configuration Environment Variables
 
-The API configuration uses environment variables. Update in [serverless.yml]
-Variable Description Example Value
+The API configuration uses environment variables. Update these varialbes in serverless.yml:
+
 API_URL: "https://api-inference.huggingface.co/models/sentence-transformers/all-MiniLM-L6-v2"
 AUTH_TOKEN: "Bearer hf_YOUR_TOKEN"
 
@@ -79,7 +79,7 @@ Running the API Locally
 To test the API locally, use the Serverless invoke local command. This simulates Lambda locally with the provided event
 data.
 
-    Start Serverless Offline:
+Start Serverless Offline:
 
 ```bash
     serverless offline
@@ -97,7 +97,7 @@ POST request should contain the test data with the phrase and base64-encoded CSV
 
 Deploying to AWS
 
-    Deploy: Deploy the API to AWS using Serverless with:
+Deploy: Deploy the API to AWS using Serverless with:
 
 ```bash
     serverless deploy
@@ -132,7 +132,7 @@ Run Tests: Run all tests using pytest with:
 
 Additional Notes
 
-    Logging: AWS Lambda logging is set up in handler.py and utils. Logs are output to CloudWatch when deployed.
-    Cost Management: Make sure to remove the deployment from AWS when no longer in use to avoid unexpected charges.
+Logging: AWS Lambda logging is set up in handler.py and utils. Logs are output to CloudWatch when deployed.
+Cost Management: Make sure to remove the deployment from AWS when no longer in use to avoid unexpected charges.
 
 Happy coding!
